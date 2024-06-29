@@ -1,6 +1,6 @@
 // lib/home_screen.dart
 import 'package:flutter/material.dart';
-import 'package:shopping_app/view/login_screen.dart';
+import 'package:shopping_app/view/login_signup_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -27,8 +27,10 @@ class HomeScreen extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.teal,
-                padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.teal,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 32.0, vertical: 16.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),

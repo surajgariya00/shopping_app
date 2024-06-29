@@ -2,12 +2,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shopping_app/model/auth.dart';
+import 'package:shopping_app/services/auth_service.dart';
 import 'home_screen.dart';
 
 class LoginSignupScreen extends ConsumerWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final AuthService authService = AuthService();
+
+  LoginSignupScreen({super.key});
+
+  void signUpUser(BuildContext context) {
+    authService.signup(
+      context: context,
+      email: _emailController.text,
+      password: _passwordController.text,
+      username: _usernameController.text,
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,7 +41,7 @@ class LoginSignupScreen extends ConsumerWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12.0),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 10,
@@ -37,6 +52,18 @@ class LoginSignupScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (!authNotifier.isLogin) ...[
+                  TextField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -46,7 +73,7 @@ class LoginSignupScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextField(
                   controller: _passwordController,
                   decoration: InputDecoration(
@@ -58,7 +85,7 @@ class LoginSignupScreen extends ConsumerWidget {
                   obscureText: true,
                 ),
                 if (!authNotifier.isLogin) ...[
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextField(
                     controller: _confirmPasswordController,
                     decoration: InputDecoration(
@@ -70,11 +97,12 @@ class LoginSignupScreen extends ConsumerWidget {
                     obscureText: true,
                   ),
                 ],
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () => _submit(context, ref),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: Colors.teal,
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.teal,
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -82,7 +110,7 @@ class LoginSignupScreen extends ConsumerWidget {
                   ),
                   child: Text(
                     authNotifier.isLogin ? 'Login' : 'Signup',
-                    style: TextStyle(fontSize: 16.0),
+                    style: const TextStyle(fontSize: 16.0),
                   ),
                 ),
                 TextButton(
@@ -91,7 +119,7 @@ class LoginSignupScreen extends ConsumerWidget {
                     authNotifier.isLogin
                         ? 'Don’t have an account? Signup'
                         : 'Already have an account? Login',
-                    style: TextStyle(color: Colors.teal),
+                    style: const TextStyle(color: Colors.teal),
                   ),
                 )
               ],
@@ -107,13 +135,13 @@ class LoginSignupScreen extends ConsumerWidget {
     final authNotifier = ref.read(authProvider);
     final email = _emailController.text;
     final password = _passwordController.text;
-    
+
     if (authNotifier.isLogin) {
       // Dummy login logic
       if (email.isNotEmpty && password.isNotEmpty) {
         // Login successful
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login successful!')),
+          const SnackBar(content: Text('Login successful!')),
         );
         Navigator.pushReplacement(
           context,
@@ -122,15 +150,20 @@ class LoginSignupScreen extends ConsumerWidget {
       } else {
         // Show error (invalid input)
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please enter valid credentials')),
+          const SnackBar(content: Text('Please enter valid credentials')),
         );
       }
     } else {
+      final username = _usernameController.text;
       final confirmPassword = _confirmPasswordController.text;
-      if (password == confirmPassword && email.isNotEmpty) {
+
+      if (password == confirmPassword &&
+          email.isNotEmpty &&
+          username.isNotEmpty) {
         // Signup successful
+        signUpUser(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Signup successful!')),
+          const SnackBar(content: Text('Signup successful!')),
         );
         Navigator.pushReplacement(
           context,
@@ -139,7 +172,8 @@ class LoginSignupScreen extends ConsumerWidget {
       } else {
         // Show error (passwords do not match or invalid input)
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Passwords do not match or invalid input!')),
+          const SnackBar(
+              content: Text('Passwords do not match or invalid input!')),
         );
       }
     }
